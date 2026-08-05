@@ -7,8 +7,6 @@ import { Label } from "@/components/ui/label"
 definePageMeta({ layout: false })
 
 const route = useRoute()
-const router = useRouter()
-const { fetch: refreshSession } = useUserSession()
 
 const username = ref("")
 const password = ref("")
@@ -23,16 +21,25 @@ async function handleSubmit() {
       method: "POST",
       body: { username: username.value, password: password.value },
     })
-    await refreshSession()
     const callbackUrl = (route.query.callbackUrl as string) || "/"
-    router.push(callbackUrl)
+    // ⚠️ SENGAJA hard navigation (window.location), BUKAN router.push()
+    // SPA biasa + refreshSession(). Alasan: useUserSession() nyimpen
+    // state sesi lewat useState("nuxt-session", ...) yg BARU ke-update
+    // setelah fetch("/api/_auth/session") SELESAI -- kalau middleware
+    // (auth.global.ts) di halaman TUJUAN sempat jalan SEBELUM state itu
+    // ke-update (race condition, terbukti TERJADI saat diuji: pengguna
+    // "diam" di halaman login krn ke-redirect BALIK ke sana dgn
+    // callbackUrl yg sama, tanpa perubahan URL yg kelihatan), middleware
+    // masih anggap "belum login" & redirect balik ke /login lagi.
+    //
+    // Hard navigation MENGHINDARI race ini SEPENUHNYA -- browser bikin
+    // request SSR BARU dgn cookie sesi yg SUDAH pasti ke-set (Set-Cookie
+    // dari respons login SELALU tersedia utk request BERIKUTNYA), server
+    // render halaman tujuan LANGSUNG dgn sesi yg benar, TANPA butuh
+    // client-side state sync sama sekali.
+    window.location.href = callbackUrl
   } catch (err: any) {
-    // Tampilkan pesan SPESIFIK dari server/api/auth/login.post.ts
-    // (BEDA pesan utk "kredensial salah" vs "tidak bisa terhubung ke
-    // Django sama sekali" -- lihat catatan lengkap di file itu),
-    // BUKAN pesan generik yang menyamaratakan semua jenis kegagalan.
     error.value = err?.data?.statusMessage || err?.data?.message || "Terjadi kesalahan saat login. Coba lagi."
-  } finally {
     loading.value = false
   }
 }
