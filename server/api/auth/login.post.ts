@@ -43,6 +43,13 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+
+  // clear session lama (kalau ada) sebelum set session baru, supaya tidak
+  // ada sisa data user lama di cookie sesi kalau login gagal di tengah
+  // proses (mis. Django menolak kredensial, tapi cookie sesi lama masih
+  // tersimpan di browser). Kalau tidak dibersihkan, login gagal kecuali cookie sesi lama dihapus manual (mis. clear cookies di browser devtools) -- ini bisa bikin bingung user.
+  await clearUserSession(event)
+
   await setUserSession(event, {
     user: data.user as any,
     accessToken: data.access,

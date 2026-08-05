@@ -53,6 +53,7 @@ export default defineNuxtConfig({
   shadcn: {
     prefix: '',
     componentDir: './app/components/ui',
+
   },
 
   // Sama pola dgn NextAuth (auth.ts::API_BASE_URL) -- djangoInternalUrl
@@ -116,4 +117,5 @@ export default defineNuxtConfig({
   typescript: {
     strict: true,
   },
+  
 })

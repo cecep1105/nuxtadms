@@ -2,6 +2,8 @@
 import { Loader2, Fingerprint } from "@lucide/vue"
 import type { Department, ActiveDevice } from "#shared/types/api"
 
+import {  Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+
 const props = defineProps<{ sn: string; alias: string; departments: Department[]; devices: ActiveDevice[] }>()
 const open = defineModel<boolean>("open", { required: true })
 
