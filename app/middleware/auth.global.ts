@@ -33,8 +33,11 @@ export default defineNuxtRouteMiddleware(async (to) => {
   const isPortalPath = to.path === PORTAL_PREFIX || to.path.startsWith(`${PORTAL_PREFIX}/`)
   const isIdCardPrintPath = to.path.startsWith(IDCARD_PRINT_PREFIX)
 
-  if (!isLoggedIn && !isLoginPage) {
+  // console.log(`[auth.global] middleware: isLoggedIn=${isLoggedIn}, isLoginPage=${isLoginPage}, isStaff=${isStaff}, isPortalPath=${isPortalPath}, isIdCardPrintPath=${isIdCardPrintPath}, to.path=${to.path}`)
 
+  console.log(isLoggedIn)
+
+  if (!isLoggedIn && !isLoginPage) {
     return navigateTo({ path: "/login", query: { callbackUrl: to.fullPath } })
   }
 

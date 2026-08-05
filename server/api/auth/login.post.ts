@@ -25,6 +25,8 @@ export default defineEventHandler(async (event) => {
       method: "POST",
       body: { username, password },
     })
+
+
   } catch (err: any) {
     // $fetch (ofetch) dari Nuxt: error PUNYA `response` kalau Django
     // SEMPAT merespons (mis. 401 kredensial salah) -- TIDAK punya
@@ -47,6 +49,5 @@ export default defineEventHandler(async (event) => {
     refreshToken: data.refresh,
     accessTokenExpires: decodeJwtExpiry(data.access),
   })
-
   return { ok: true }
 })

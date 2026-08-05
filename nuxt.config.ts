@@ -35,6 +35,14 @@ export default defineNuxtConfig({
       mediaUrl: '',
       wsBaseUrl: '',
     },
+    session: {
+      password: process.env.NUXT_SESSION_PASSWORD || '790f61123f1e4592b346a02cd4499023',
+    },
+
+
+
+
+
   },
 
   app: {
