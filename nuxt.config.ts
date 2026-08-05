@@ -18,17 +18,22 @@ export default defineNuxtConfig({
     componentDir: './app/components/ui',
   },
 
-  // Sama pola dgn NextAuth (auth.ts::API_BASE_URL) -- dibaca SERVER-SIDE
-  // saja (bukan NUXT_PUBLIC_*), dipakai server/api/auth/* & proxy fetch
-  // internal Docker Compose. `public.apiBaseUrl` yg BENAR-BENAR dipanggil
-  // dari BROWSER (beda origin dari server-side call) -- SAMA pola dgn
+  // Sama pola dgn NextAuth (auth.ts::API_BASE_URL) -- djangoInternalUrl
+  // dipakai server/api/auth/* & session-refresh.ts, TIDAK terekspos ke
+  // browser. `public.apiBaseUrl` yg BENAR-BENAR dipanggil dari BROWSER
+  // (beda origin dari server-side call) -- SAMA pola dgn
   // NEXT_PUBLIC_API_BASE_URL di app Next.js.
+  //
+  // ⚠️ WAJIB override lewat env var BERPREFIX NUXT_ (NUXT_DJANGO_INTERNAL_URL,
+  // BUKAN cuma DJANGO_INTERNAL_URL) -- ini aturan Nuxt runtimeConfig, BUKAN
+  // pilihan bebas. Nilai default di bawah HANYA dipakai kalau env var itu
+  // TIDAK diisi sama sekali (lihat .env.example).
   runtimeConfig: {
-    djangoInternalUrl: process.env.DJANGO_INTERNAL_URL || 'http://127.0.0.1:8000/api/v1',
+    djangoInternalUrl: 'http://127.0.0.1:8000/api/v1',
     public: {
-      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:8000/api/v1',
-      mediaUrl: process.env.NUXT_PUBLIC_MEDIA_URL || '',
-      wsBaseUrl: process.env.NUXT_PUBLIC_WS_BASE_URL || '',
+      apiBaseUrl: 'http://127.0.0.1:8000/api/v1',
+      mediaUrl: '',
+      wsBaseUrl: '',
     },
   },
 

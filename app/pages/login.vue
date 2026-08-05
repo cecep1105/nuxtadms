@@ -26,8 +26,12 @@ async function handleSubmit() {
     await refreshSession()
     const callbackUrl = (route.query.callbackUrl as string) || "/"
     router.push(callbackUrl)
-  } catch {
-    error.value = "Username atau password salah."
+  } catch (err: any) {
+    // Tampilkan pesan SPESIFIK dari server/api/auth/login.post.ts
+    // (BEDA pesan utk "kredensial salah" vs "tidak bisa terhubung ke
+    // Django sama sekali" -- lihat catatan lengkap di file itu),
+    // BUKAN pesan generik yang menyamaratakan semua jenis kegagalan.
+    error.value = err?.data?.statusMessage || err?.data?.message || "Terjadi kesalahan saat login. Coba lagi."
   } finally {
     loading.value = false
   }

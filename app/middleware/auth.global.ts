@@ -34,6 +34,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
   const isIdCardPrintPath = to.path.startsWith(IDCARD_PRINT_PREFIX)
 
   if (!isLoggedIn && !isLoginPage) {
+
     return navigateTo({ path: "/login", query: { callbackUrl: to.fullPath } })
   }
 
