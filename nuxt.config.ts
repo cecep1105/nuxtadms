@@ -30,19 +30,41 @@ export default defineNuxtConfig({
   // TIDAK diisi sama sekali (lihat .env.example).
   runtimeConfig: {
     djangoInternalUrl: 'http://127.0.0.1:8000/api/v1',
+    // ⚠️ BUG YANG SUDAH DIPERBAIKI: nuxt-auth-utils TIDAK set `secure`
+    // eksplisit di config cookie sesi bawaannya -- jatuh ke default
+    // library dasarnya (h3/cookie-es), yaitu TRUE. Cookie dgn flag
+    // Secure HANYA dikirim browser lewat HTTPS -- kalau app diakses
+    // via HTTP biasa (umum utk dev lokal & BANYAK deployment internal
+    // di balik reverse proxy tanpa TLS), browser DIAM-DIAM MENOLAK
+    // menyimpan/mengirim cookie ini. Gejalanya PERSIS spt yg
+    // dilaporkan: login API sukses (cookie DIKIRIM server), TAPI
+    // browser tidak pernah benar2 MENYIMPANNYA -- request berikutnya
+    // TIDAK bawa cookie sesi sama sekali, isLoggedIn SELALU false.
+    // curl TIDAK mereproduksi bug ini krn curl tidak menegakkan aturan
+    // Secure cookie spt browser sungguhan.
+    //
+    // ⚠️ CATATAN PENTING soal LOKASI config ini: nuxt-auth-utils BACA
+    // dari `runtimeConfig.session` (BUKAN top-level `session` di
+    // defineNuxtConfig() -- percobaan PERTAMA saya taruh di situ,
+    // config-nya SAMA SEKALI TIDAK terbaca modul, Secure tetap true
+    // walau nilai yg di-set false, krn Nuxt TIDAK PERNAH mem-forward
+    // top-level `session` ke `runtimeConfig.session` secara otomatis).
+    //
+    // Default di bawah: false (aman utk HTTP lokal/internal). Kalau
+    // deployment PRODUKSI Anda benar2 di belakang HTTPS (nginx dgn
+    // TLS, dst), SET env var NUXT_SESSION_COOKIE_SECURE=true supaya
+    // cookie sesi ikut terlindungi flag Secure sesuai praktik
+    // keamanan yang benar.
+    session: {
+      cookie: {
+        secure: process.env.NUXT_SESSION_COOKIE_SECURE === 'true',
+      },
+    },
     public: {
       apiBaseUrl: 'http://127.0.0.1:8000/api/v1',
       mediaUrl: '',
       wsBaseUrl: '',
     },
-    session: {
-      password: process.env.NUXT_SESSION_PASSWORD || '790f61123f1e4592b346a02cd4499023',
-    },
-
-
-
-
-
   },
 
   app: {
