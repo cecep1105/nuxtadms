@@ -1,0 +1,158 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/*
+ * Porting LANGSUNG dari sistem warna NEXTADMS (nextadms_repo/src/app/globals.css)
+ * -- token HSL yg SAMA PERSIS (light "Ledger" / dark "Void", aksen
+ * teal), termasuk .sidebar-shell (identitas navy sidebar yg TETAP
+ * terlepas dari mode terang/gelap) -- TIDAK diciptakan ulang dari nol,
+ * supaya NUXTADMS terasa SATU KELUARGA visual dgn NEXTADMS meski
+ * frameworknya beda total.
+ */
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: 210 24% 97%;
+  --foreground: 222 47% 11%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 47% 11%;
+  --primary: 174 70% 34%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 210 20% 93%;
+  --secondary-foreground: 222 47% 11%;
+  --muted: 210 20% 93%;
+  --muted-foreground: 215 16% 42%;
+  --accent: 174 60% 92%;
+  --accent-foreground: 174 70% 20%;
+  --destructive: 350 78% 48%;
+  --destructive-foreground: 0 0% 100%;
+  --success: 158 60% 34%;
+  --success-foreground: 0 0% 100%;
+  --warning: 32 90% 45%;
+  --warning-foreground: 0 0% 100%;
+  --border: 210 18% 87%;
+  --input: 210 18% 87%;
+  --ring: 174 70% 34%;
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: 222 47% 6%;
+  --foreground: 210 20% 92%;
+  --card: 222 40% 9%;
+  --card-foreground: 210 20% 92%;
+  --popover: 222 42% 8%;
+  --popover-foreground: 210 20% 92%;
+  --primary: 175 70% 48%;
+  --primary-foreground: 222 47% 6%;
+  --secondary: 222 30% 14%;
+  --secondary-foreground: 210 20% 92%;
+  --muted: 222 28% 13%;
+  --muted-foreground: 215 15% 60%;
+  --accent: 175 45% 16%;
+  --accent-foreground: 175 70% 70%;
+  --destructive: 350 75% 58%;
+  --destructive-foreground: 0 0% 100%;
+  --success: 158 55% 48%;
+  --success-foreground: 222 47% 6%;
+  --warning: 38 88% 55%;
+  --warning-foreground: 222 47% 6%;
+  --border: 222 24% 17%;
+  --input: 222 24% 17%;
+  --ring: 175 70% 48%;
+}
+
+/* Sidebar -- identitas "Void" TETAP, terlepas dari mode terang/gelap
+   (lihat catatan lengkap di versi Next.js, alasan desainnya SAMA). */
+.sidebar-shell {
+  --card: 222 45% 10%;
+  --card-foreground: 210 20% 88%;
+  --foreground: 210 20% 88%;
+  --muted-foreground: 215 15% 58%;
+  --secondary: 222 35% 17%;
+  --secondary-foreground: 210 20% 90%;
+  --border: 222 30% 20%;
+  --accent: 222 35% 17%;
+  --accent-foreground: 210 20% 90%;
+  --primary: 175 70% 48%;
+  --primary-foreground: 222 47% 6%;
+}
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-success: hsl(var(--success));
+  --color-success-foreground: hsl(var(--success-foreground));
+  --color-warning: hsl(var(--warning));
+  --color-warning-foreground: hsl(var(--warning-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--font-sans);
+  }
+}
+
+/* Motif signature: "scan pulse" -- cincin konsentris menandakan platform
+   sbg pusat yang terhubung ke seluruh infrastruktur yang dikelolanya,
+   dipakai di halaman login & indikator loading. */
+@layer utilities {
+  .scan-ring {
+    @apply absolute inset-0 rounded-full border border-primary/40;
+    animation: scan-pulse 2.2s cubic-bezier(0.2, 0.6, 0.4, 1) infinite;
+  }
+  .font-tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@keyframes scan-pulse {
+  0% { transform: scale(0.7); opacity: 0.9; }
+  80% { transform: scale(1.8); opacity: 0; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+
+/* Scrollbar tipis -- selaras dgn tema dense/teknis, bukan default OS yang tebal */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-border rounded-full;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-muted-foreground/40;
+}
