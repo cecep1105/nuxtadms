@@ -2,6 +2,7 @@
 import type { UserListPaginated, DjangoApiUser } from "#shared/types/api"
 
 const { request } = useApiClient()
+const { user: currentUser } = useUserSession()
 const search = ref("")
 
 const { data, pending, error, refresh } = await useAsyncData(
@@ -10,6 +11,9 @@ const { data, pending, error, refresh } = await useAsyncData(
   { watch: [] }
 )
 
+const isSuperuser = computed(() => currentUser.value?.is_superuser ?? false)
+const currentUserId = computed(() => currentUser.value?.id)
+
 function handleSearch() {
   refresh()
 }
@@ -17,7 +21,11 @@ function handleSearch() {
 
 <template>
   <div>
-    <PageHeader title="Manajemen User" description="Kelola akun staff yang punya akses ke dashboard ini (LDAP & lokal)." />
+    <PageHeader title="Manajemen User" description="Kelola akun staff yang punya akses ke dashboard ini (LDAP & lokal).">
+      <template #action>
+        <UserFormDialog mode="create" :is-superuser="isSuperuser" />
+      </template>
+    </PageHeader>
 
     <Card>
       <div class="flex items-center gap-2 border-b border-border p-3">
@@ -36,12 +44,14 @@ function handleSearch() {
             <TableHead>Nama</TableHead>
             <TableHead>Email</TableHead>
             <TableHead>Sumber Auth</TableHead>
+            <TableHead>Departemen</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead class="text-right">Aksi</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           <TableRow v-if="!data?.results.length">
-            <TableCell :colspan="5" class="py-8 text-center text-muted-foreground">Tidak ada user ditemukan.</TableCell>
+            <TableCell :colspan="7" class="py-8 text-center text-muted-foreground">Tidak ada user ditemukan.</TableCell>
           </TableRow>
           <TableRow v-for="u in data?.results" :key="u.id" v-else>
             <TableCell class="font-mono font-medium">{{ u.username }}</TableCell>
@@ -55,11 +65,38 @@ function handleSearch() {
             <TableCell>
               <Badge :variant="u.auth_source === 'ldap' ? 'default' : 'secondary'">{{ u.auth_source }}</Badge>
             </TableCell>
+            <TableCell class="text-muted-foreground">{{ u.department || "-" }}</TableCell>
             <TableCell>
               <div class="flex flex-wrap gap-1">
                 <Badge :variant="u.is_active ? 'success' : 'secondary'">{{ u.is_active ? "Aktif" : "Nonaktif" }}</Badge>
                 <Badge v-if="u.is_staff" variant="default">Staff</Badge>
                 <Badge v-if="u.is_superuser" variant="warning">Superuser</Badge>
+                <Badge v-if="u.must_change_password" variant="outline">Wajib ganti pw</Badge>
+              </div>
+            </TableCell>
+            <TableCell>
+              <div class="flex justify-end gap-0.5">
+                <UserFormDialog mode="edit" :user="u" />
+                <ResetPasswordDialog v-if="u.auth_source === 'local'" :user-id="u.id" :username="u.username" />
+                <ToggleActiveButton
+                  :user-id="u.id" :is-active="u.is_active"
+                  :disabled="u.id === currentUserId"
+                  :disabled-reason="u.id === currentUserId ? 'Tidak dapat mengubah status akun sendiri' : undefined"
+                />
+                <ManagePermissionsDialog :user-id="u.id" :username="u.username" :is-staff="u.is_staff" />
+                <SetStaffButton
+                  v-if="isSuperuser"
+                  :user-id="u.id" :is-staff="u.is_staff"
+                  :disabled="u.id === currentUserId"
+                  :disabled-reason="u.id === currentUserId ? 'Tidak dapat mengubah role sendiri' : undefined"
+                />
+                <!-- Hapus user CUMA boleh superuser, TIDAK CUKUP staff biasa -- sama catatan dgn versi Next.js. -->
+                <DeleteConfirmButton
+                  v-if="isSuperuser && !u.is_superuser"
+                  :endpoint="`/users/${u.id}/`" :label="`User '${u.username}'`"
+                  :disabled="u.id === currentUserId"
+                  :disabled-reason="u.id === currentUserId ? 'Tidak dapat menghapus akun sendiri' : undefined"
+                />
               </div>
             </TableCell>
           </TableRow>

@@ -20,6 +20,23 @@ export interface UserListPaginated<T> {
   results: T[]
 }
 
+export interface EmployeeSearchResult {
+  id: number
+  pin: string
+  name: string
+}
+
+export interface FeaturePermissionItem {
+  codename: string
+  label: string
+  granted: boolean
+}
+
+export interface FeaturePermissionsResponse {
+  user_id: number
+  username?: string
+  permissions: FeaturePermissionItem[]
+}
 export interface DjangoApiUser {
   id: number
   username: string
