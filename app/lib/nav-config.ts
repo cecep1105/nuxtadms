@@ -1,10 +1,20 @@
 import type { Component } from "vue"
-import { LayoutDashboard, Users, HardDrive, UserCircle, KeyRound } from "@lucide/vue"
+import {
+  LayoutDashboard, Users, Building2, Cpu, ClipboardList, Fingerprint,
+  ScrollText, FileClock, Terminal, CalendarClock, MapPinned, Route,
+  ToggleLeft, ScanFace, Smartphone, History, UserCircle, KeyRound,
+  Network, Server, Router, Shield, Globe, Lock, HardDrive, Monitor,
+  Database, CreditCard, Camera, UserPlus, LayoutList, Mail,
+} from "@lucide/vue"
 
 export interface NavItem {
   title: string
+  /** Opsional -- item TANPA href jadi "folder" (dropdown bertingkat),
+   * tidak navigasi ke mana pun sendiri, cuma buka/tutup `children`-nya. */
   href?: string
   icon: Component
+  /** Sub-item, dipakai grup "Infrastructure Management" (Mikrotik/Mail
+   * Server/Active Directory/VMware jadi sub-menu bertingkat di dalamnya). */
   children?: NavItem[]
 }
 
@@ -15,37 +25,112 @@ export interface NavGroup {
 }
 
 /**
- * Starter -- cuma 2 modul inti (Dashboard, Active Device) sesuai
- * kesepakatan tahap fondasi. Struktur TIPE-nya SAMA PERSIS dgn
- * nav-config.ts versi Next.js (NavGroup > NavItem, item.children utk
- * grup bertingkat) supaya modul berikutnya gampang ditambah dgn pola
- * yang sudah ada, bukan diciptakan ulang tiap kali.
+ * Struktur SAMA PERSIS dgn nav-config.ts versi Next.js -- SEMUA menu
+ * sudah lengkap di sini (36 rute + Dashboard + Manajemen User), TAPI
+ * SEBAGIAN BESAR halamannya masih placeholder ComingSoon.vue (lihat
+ * app/pages/**), diporting SATU PER SATU bertahap. Ikon MailQueueIcon
+ * kustom versi Next.js diganti Mail (lucide standar) di sini --
+ * BEDA kecil yang disengaja, bukan kelalaian.
  */
 export const navGroups: NavGroup[] = [
   {
     label: "Utama",
-    items: [
-      { title: "Dashboard", href: "/", icon: LayoutDashboard },
-    ],
-  },
-  {
-    label: "iClock — Device & Absensi",
-    items: [
-      { title: "Active Device", href: "/iclock/active-devices", icon: HardDrive },
-    ],
+    items: [{ title: "Dashboard", href: "/", icon: LayoutDashboard }],
   },
   {
     label: "Akses",
+    items: [{ title: "Manajemen User", href: "/users", icon: Users }],
+  },
+  {
+    label: "iClock — Device & Absensi",
+    icon: Cpu,
     items: [
-      { title: "Manajemen User", href: "/users", icon: Users },
+      { title: "Pool / Department", href: "/iclock/departments", icon: Building2 },
+      { title: "Active Device", href: "/iclock/active-devices", icon: Cpu },
+      { title: "Registered Device", href: "/iclock/registered-devices", icon: ClipboardList },
+      { title: "Employee", href: "/iclock/employees", icon: Fingerprint },
+      { title: "Transaction", href: "/iclock/transactions", icon: ScrollText },
+      { title: "Attendance Recap", href: "/iclock/attendance-recap", icon: CalendarClock },
+      { title: "Operation Log", href: "/iclock/operation-logs", icon: FileClock },
+      { title: "Device Log", href: "/iclock/device-logs", icon: History },
+      { title: "Device Command", href: "/iclock/device-commands", icon: Terminal },
+    ],
+  },
+  {
+    label: "Mobile Attendance",
+    icon: Smartphone,
+    items: [
+      { title: "Mobile Pool", href: "/mclock/mobile-pools", icon: MapPinned },
+      { title: "Pool Location (Geofence)", href: "/mclock/mobile-pool-locations", icon: Route },
+      { title: "Pool Device Function", href: "/mclock/pool-device-functions", icon: ToggleLeft },
+      { title: "Log Absensi GPS", href: "/mattendance/logs", icon: Smartphone },
+      { title: "Face Profile", href: "/mattendance/face-profiles", icon: ScanFace },
+      { title: "Data Mobile Attendance", href: "/mclock/mobile-attendance", icon: FileClock },
+    ],
+  },
+  {
+    label: "Infrastructure Management",
+    icon: Router,
+    items: [
+      {
+        title: "Mikrotik", icon: Server,
+        children: [
+          { title: "DHCP Leases", href: "/netmgmt/mikrotik/dhcp", icon: Server },
+          { title: "Firewall Filter", href: "/netmgmt/mikrotik/fwfilter", icon: Shield },
+          { title: "Netwatch", href: "/netmgmt/mikrotik/netwatch", icon: Network },
+        ],
+      },
+      {
+        title: "Mail Server (Zentyal)", icon: Mail,
+        children: [
+          { title: "Mail Queue", href: "/netmgmt/zentyal/mail-queue", icon: Mail },
+          { title: "Today's Log", href: "/netmgmt/zentyal/today-log", icon: FileClock },
+          { title: "Transport Map", href: "/netmgmt/zentyal/transport", icon: Route },
+          { title: "Blocked Senders", href: "/netmgmt/zentyal/block-senders", icon: Shield },
+          { title: "IMAP Logs", href: "/netmgmt/zentyal/imap-logs", icon: ScrollText },
+          { title: "SASL Logs", href: "/netmgmt/zentyal/sasl-logs", icon: ScrollText },
+          { title: "Users", href: "/netmgmt/zentyal/users", icon: Users },
+          { title: "Groups", href: "/netmgmt/zentyal/groups", icon: Users },
+        ],
+      },
+      {
+        title: "Active Directory", icon: Server,
+        children: [
+          { title: "Users", href: "/netmgmt/active-directory/users", icon: Users },
+          { title: "Locked Users", href: "/netmgmt/active-directory/locked-users", icon: Lock },
+          { title: "Groups", href: "/netmgmt/active-directory/groups", icon: Network },
+          { title: "DNS Zones", href: "/netmgmt/active-directory/dns", icon: Globe },
+        ],
+      },
+      {
+        title: "VMware", icon: HardDrive,
+        children: [
+          { title: "Host", href: "/netmgmt/vmware/hosts", icon: Server },
+          { title: "VM Guest", href: "/netmgmt/vmware/vms", icon: Monitor },
+        ],
+      },
+      { title: "Cloudflare DNS", href: "/netmgmt/cloudflare/zones", icon: Globe },
+      { title: "Data IT-Infra", href: "/netmgmt/itinfra", icon: Database },
+    ],
+  },
+  {
+    label: "ID Card",
+    icon: CreditCard,
+    items: [
+      { title: "Generate Kartu", href: "/idcard/generate", icon: Camera },
+      { title: "Daftar Kartu", href: "/idcard/cards", icon: LayoutList },
+      { title: "Data Visitor/BHL", href: "/idcard/holders", icon: UserPlus },
+      { title: "Template", href: "/idcard/templates", icon: CreditCard },
     ],
   },
 ]
 
 /**
- * Nav utk akun BUKAN staff/superuser -- SAMA konsep dgn versi Next.js,
- * sidebar portal memang lebih sederhana (portal sendiri berbasis kartu
- * di halaman /portal, bukan sidebar penuh).
+ * Nav utk akun BUKAN staff/superuser -- lihat middleware.ts, akun
+ * begini di-redirect ke /portal & tidak bisa akses halaman dashboard
+ * ini sama sekali (nav ini disiapkan utk kelengkapan tipe, TAPI TIDAK
+ * DIPAKAI Sidebar.vue -- middleware SUDAH mencegah user non-staff
+ * sampai ke layout dashboard sama sekali).
  */
 export const nonStaffNavGroups: NavGroup[] = [
   {

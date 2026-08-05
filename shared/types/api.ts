@@ -20,6 +20,60 @@ export interface UserListPaginated<T> {
   results: T[]
 }
 
+export interface Department {
+  DeptID: number
+  DeptName: string
+}
+
+export interface ActiveDevice {
+  SN: string
+  Alias: string
+  DeviceName: string | null
+  DeptID: number | null
+  DeptName: string | null
+  Function: string | null
+  IPAddress: string | null
+  MAC: string | null
+  TZAdj: number | null
+  State: number
+  LastActivity: string | null
+  LastData: string | null
+  PushVersion: string | null
+  LogStamp: string | null
+  OpLogStamp: string | null
+  PhotoStamp: string | null
+  ErrorDelay: number
+  Delay: number
+  TransTimes: string | null
+  TransInterval: number
+  UpdateDB: string
+  Realtime: boolean
+  Encrypt: boolean
+}
+
+export interface DeviceLiveUser {
+  user_id: string
+  name: string
+  privilege: number
+  password?: string
+  group_id?: string
+  card?: number
+}
+
+export interface DeviceLiveLog {
+  user_id: string
+  timestamp: string | null
+  status: number | null
+  status_label: string
+  punch: number | null
+  punch_label: string
+}
+
+export interface DeviceFunctionChoice {
+  value: string
+  label: string
+}
+
 export interface EmployeeSearchResult {
   id: number
   pin: string
