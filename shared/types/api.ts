@@ -20,9 +20,95 @@ export interface UserListPaginated<T> {
   results: T[]
 }
 
+export interface Transaction {
+  id: number
+  UserID: number
+  EmployeeName: string | null
+  EmployeePIN: string | null
+  TTime: string
+  State: string
+  StateDisplay: string
+  Verify: number
+  VerifyDisplay: string
+  SN: string | null
+  Function: string | null
+}
+
+export interface OperationLog {
+  id: number
+  SN: string | null
+  admin: number
+  OP: number
+  OpName: string
+  OPTime: string
+  Object: number | null
+  Param1: number | null
+  Param2: number | null
+  Param3: number | null
+}
+
+export interface DeviceLog {
+  id: number
+  SN: string
+  OP: string
+  Object: string | null
+  Cnt: number
+  ECnt: number
+  OpTime: string
+}
+
+export interface DeviceCommand {
+  id: number
+  SN: string
+  CmdContent: string
+  CmdCommitTime: string
+  CmdTransTime: string | null
+  CmdOverTime: string | null
+  CmdReturn: string | null
+  User: number | null
+  Username: string | null
+}
+
+export interface RegisteredDevice {
+  id: number
+  SN: string
+  Alias: string | null
+  DeviceName: string | null
+  DeptID: number | null
+  DeptName: string | null
+  Function: string | null
+  IPAddress: string | null
+  MAC: string | null
+  IPRouter: string | null
+  LastActivity: string | null
+}
+
+export interface Employee {
+  id: number
+  PIN: string
+  EName: string | null
+  DeptID: number | null
+  DeptName: string | null
+  SN: string | null
+  Gender: string | null
+  Title: string | null
+  Card: string | null
+  Privilege: number | null
+  Tele: string | null
+  Mobile: string | null
+  Password?: string
+  UTime: string | null
+  LastVerify: number | null
+  LastPool: string | null
+  LastDevice: string | null
+}
+
 export interface Department {
   DeptID: number
   DeptName: string
+  NetID: number
+  DeptRouter: string
+  DeptSubnet: string
 }
 
 export interface ActiveDevice {
@@ -72,6 +158,49 @@ export interface DeviceLiveLog {
 export interface DeviceFunctionChoice {
   value: string
   label: string
+}
+
+export interface RecapDateColumn {
+  date: string
+  day_name: string
+}
+
+export interface RecapCell {
+  date: string
+  in_first: string | null
+  in_count: number
+  out_last: string | null
+  out_count: number
+}
+
+export interface RecapRow {
+  no: number
+  pin: string
+  name: string
+  cells: RecapCell[]
+}
+
+export interface AttendanceRecapResponse {
+  count: number
+  page: number
+  page_size: number
+  date_columns: RecapDateColumn[]
+  results: RecapRow[]
+}
+
+export interface AttendanceRecapCardRow {
+  date: string
+  time: string
+  device: string | null
+  type: "IN" | "OUT"
+}
+
+export interface AttendanceRecapCardResponse {
+  pin: string
+  name: string | null
+  year: number
+  month: number
+  rows: AttendanceRecapCardRow[]
 }
 
 export interface EmployeeSearchResult {
