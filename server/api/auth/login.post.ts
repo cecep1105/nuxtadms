@@ -44,13 +44,29 @@ export default defineEventHandler(async (event) => {
   }
 
 
-  // clear session lama (kalau ada) sebelum set session baru, supaya tidak
-  // ada sisa data user lama di cookie sesi kalau login gagal di tengah
-  // proses (mis. Django menolak kredensial, tapi cookie sesi lama masih
-  // tersimpan di browser). Kalau tidak dibersihkan, login gagal kecuali cookie sesi lama dihapus manual (mis. clear cookies di browser devtools) -- ini bisa bikin bingung user.
-  await clearUserSession(event)
-
-  await setUserSession(event, {
+  // ⚠️ BUG YANG SUDAH DIPERBAIKI (login gagal setelah logout/sesi
+  // expired, kecuali cookie dihapus manual): setUserSession() TERNYATA
+  // MEN-*MERGE* data baru dgn sesi LAMA (defu(data, session.data) --
+  // lihat node_modules/nuxt-auth-utils/dist/runtime/server/utils/session.js),
+  // BUKAN replace penuh. Kalau sesi lama py field `error:
+  // "RefreshTokenError"` (dari session-refresh.ts, ditandai saat
+  // refresh token JUGA sudah expired) & TIDAK di-override eksplisit
+  // oleh data login baru, field itu TETAP NEMPEL ke sesi baru --
+  // middleware (checknya: `!session.value?.error`) terus anggap
+  // "belum login" walau login API-nya BENAR-BENAR sukses & token BARU
+  // valid, user KE-REDIRECT TERUS ke /login (kelihatan spt "tidak bisa
+  // login").
+  //
+  // Percobaan pertama saya perbaiki dgn clearUserSession(event) lalu
+  // setUserSession(event, ...) terpisah -- SECARA TEORI harusnya cukup
+  // (clear dulu baru merge dgn sesi kosong = sama dgn replace), TAPI
+  // 2 panggilan terpisah ini masing2 manggil _useSession(event) SENDIRI
+  // -- TIDAK ada jaminan keduanya reuse instance sesi yang PERSIS sama
+  // dalam 1 request scope yg sama, jadi TETAP bisa gagal di kondisi
+  // tertentu. replaceUserSession() jauh LEBIH AMAN krn clear+update
+  // dilakukan ATOMIK dlm SATU pemanggilan _useSession(), pakai SATU
+  // instance sesi yg sama -- TIDAK ada celah utk sisa data lama nempel.
+  await replaceUserSession(event, {
     user: data.user as any,
     accessToken: data.access,
     refreshToken: data.refresh,
