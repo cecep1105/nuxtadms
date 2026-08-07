@@ -68,6 +68,14 @@ export default defineNuxtConfig({
   // TIDAK diisi sama sekali (lihat .env.example).
   runtimeConfig: {
     djangoInternalUrl: 'http://127.0.0.1:8000/api/v1',
+    // Kredensial vCenter -- SERVER-ONLY (private, bukan di bawah
+    // `public`), dipakai server/utils/vsphere.ts. Override via
+    // NUXT_VSPHERE_HOST / NUXT_VSPHERE_USER / NUXT_VSPHERE_PASSWORD /
+    // NUXT_VSPHERE_ALLOW_SELF_SIGNED_CERT.
+    vsphereHost: '',
+    vsphereUser: '',
+    vspherePassword: '',
+    vsphereAllowSelfSignedCert: 'true',
     // ⚠️ BUG YANG SUDAH DIPERBAIKI: nuxt-auth-utils TIDAK set `secure`
     // eksplisit di config cookie sesi bawaannya -- jatuh ke default
     // library dasarnya (h3/cookie-es), yaitu TRUE. Cookie dgn flag

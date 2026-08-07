@@ -187,6 +187,53 @@ export interface CloudflareDnsRecord {
   priority: number | null
 }
 
+export type VsphereConnectionState = "CONNECTED" | "DISCONNECTED" | "NOT_RESPONDING"
+export type VspherePowerState = "POWERED_ON" | "POWERED_OFF" | "SUSPENDED"
+
+export interface VsphereHost {
+  host: string
+  name: string
+  connection_state: VsphereConnectionState
+  power_state: VspherePowerState
+}
+
+export interface VsphereVm {
+  vm: string
+  name: string
+  power_state: VspherePowerState
+  cpu_count: number
+  memory_size_MiB: number
+}
+
+export interface VmwareDisk {
+  label: string
+  capacity_gb: number
+  thin_provisioned: boolean
+  datastore_name: string | null
+}
+
+export interface VmwareDatastore {
+  name: string
+  type: string
+  capacity_gb: number
+  free_space_gb: number
+}
+
+export interface VmwareVmDetail {
+  vm: string
+  name: string
+  power_state: string
+  guest_full_name: string | null
+  guest_hostname: string | null
+  guest_ip_address: string | null
+  tools_status: string | null
+  tools_running_status: string | null
+  num_cpu: number | null
+  memory_mb: number | null
+  disks: VmwareDisk[]
+  datastores: VmwareDatastore[]
+}
+
 export interface Department {
   DeptID: number
   DeptName: string
