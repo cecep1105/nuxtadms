@@ -62,9 +62,31 @@ function findBreadcrumb(pathname: string): BreadcrumbSegment[] {
  * Leases" bisa diganti "Firewall Filter"/"Netwatch") jadi dropdown, bisa
  * lompat ke halaman LAIN di level yang sama TANPA perlu buka sidebar --
  * paling berguna saat sidebar sedang diciutkan (collapsed).
+ *
+ * ⚠️ BUG YANG SUDAH DIPERBAIKI (dropdown breadcrumb "nyangkut" tetap
+ * terbuka setelah navigasi): komponen ini hidup di Topbar.vue, BAGIAN
+ * DARI LAYOUT (default.vue) -- BUKAN bagian dari halaman itu sendiri.
+ * Nuxt TIDAK me-remount layout antar navigasi halaman (cuma konten
+ * <NuxtPage /> yang diganti) -- kalau 1 segmen breadcrumb py LABEL
+ * yang SAMA PERSIS sebelum & sesudah navigasi (mis. "Infrastructure
+ * Management" tetap muncul di breadcrumb halaman TUJUAN juga), Vue
+ * `v-for` (dgn key `${segment.label}-${i}`) MEMAKAI ULANG instance
+ * komponen DropdownMenu yang SAMA (TIDAK di-destroy+recreate) --
+ * status buka/tutupnya (state INTERNAL reka-ui, BUKAN prop) BISA
+ * "kebawa" dari sebelum navigasi.
+ *
+ * FIX: kontrol status buka/tutup SETIAP dropdown scr EKSPLISIT lewat
+ * `openKey` di sini (BUKAN pasrahkan ke state internal reka-ui), &
+ * PAKSA tertutup (openKey = null) SETIAP KALI route berubah -- jaminan
+ * ini TIDAK bergantung pada detail teknis persis kenapa state bisa
+ * "kebawa" (persistence layout, quirk SSR/hydration, dst), SELALU
+ * benar utk SEMUA skenario navigasi.
  */
 const route = useRoute()
 const segments = computed(() => findBreadcrumb(route.path))
+
+const openKey = ref<string | null>(null)
+watch(() => route.path, () => { openKey.value = null })
 </script>
 
 <template>
@@ -87,8 +109,13 @@ const segments = computed(() => findBreadcrumb(route.path))
       </template>
 
       <!-- Ada sibling -- dropdown, supaya bisa lompat ke menu lain LEWAT
-           breadcrumb tanpa perlu buka sidebar. -->
-      <DropdownMenu v-else>
+           breadcrumb tanpa perlu buka sidebar. `open` DIKONTROL EKSPLISIT
+           (bukan uncontrolled bawaan) -- lihat catatan bug di atas. -->
+      <DropdownMenu
+        v-else
+        :open="openKey === `${segment.label}-${i}`"
+        @update:open="(v) => (openKey = v ? `${segment.label}-${i}` : null)"
+      >
         <DropdownMenuTrigger
           :class="['inline-flex items-center gap-0.5 truncate rounded px-1 -mx-1 hover:bg-secondary', i === segments.length - 1 ? 'font-medium text-foreground' : 'text-muted-foreground']"
         >
@@ -96,7 +123,11 @@ const segments = computed(() => findBreadcrumb(route.path))
           <ChevronDown class="h-3 w-3 shrink-0 opacity-60" />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start">
-          <DropdownMenuItem v-for="opt in segment.options" :key="opt.label" as-child :class="opt.isCurrent ? 'bg-accent' : ''">
+          <DropdownMenuItem
+            v-for="opt in segment.options" :key="opt.label" as-child
+            :class="opt.isCurrent ? 'bg-accent' : ''"
+            @click="openKey = null"
+          >
             <NuxtLink :to="opt.href">{{ opt.label }}</NuxtLink>
           </DropdownMenuItem>
         </DropdownMenuContent>
