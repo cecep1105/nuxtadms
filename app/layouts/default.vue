@@ -9,13 +9,15 @@
 </script>
 
 <template>
-  <div class="flex min-h-screen">
-    <Sidebar />
-    <div class="flex min-w-0 flex-1 flex-col">
-      <Topbar />
-      <main class="flex-1 p-3 sm:p-5">
-        <slot />
-      </main>
+  <TooltipProvider>
+    <div class="flex min-h-screen">
+      <Sidebar />
+      <div class="flex min-w-0 flex-1 flex-col">
+        <Topbar />
+        <main class="flex-1 p-3 sm:p-5">
+          <slot />
+        </main>
+      </div>
     </div>
-  </div>
+  </TooltipProvider>
 </template>

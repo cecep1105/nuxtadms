@@ -36,6 +36,7 @@ const displayName = computed(() => user.value?.full_name || user.value?.username
 
     <InteractiveBreadcrumb />
 
+    <GlobalNetmgmtIndicators />
     <ThemeToggle />
 
     <DropdownMenu>
