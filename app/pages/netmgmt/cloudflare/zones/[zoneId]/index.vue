@@ -45,6 +45,7 @@ const { data, pending, error } = await useAsyncData(
       <Table v-else>
         <TableHeader>
           <TableRow>
+            <TableHead><RouterOSSortableHeader column-key="name" label="No" /></TableHead>
             <TableHead><RouterOSSortableHeader column-key="name" label="Nama" /></TableHead>
             <TableHead><RouterOSSortableHeader column-key="type" label="Tipe" /></TableHead>
             <TableHead>Isi</TableHead>
@@ -57,8 +58,10 @@ const { data, pending, error } = await useAsyncData(
           <TableRow v-if="!data?.results.length">
             <TableCell :colspan="6" class="py-8 text-center text-muted-foreground">Tidak ada record ditemukan.</TableCell>
           </TableRow>
-          <TableRow v-for="record in data?.results" :key="record.id" v-else>
+          <TableRow v-for="(record,index) in data?.results" :key="record.id" v-else>
+            <TableCell class="font-mono">{{ (Number(route.query.page ?? '1') - 1) * pageSize + index + 1 }}</TableCell>
             <TableCell class="font-mono">{{ record.name }}</TableCell>
+
             <TableCell><Badge variant="secondary">{{ record.type }}</Badge></TableCell>
             <TableCell class="max-w-xs truncate font-mono text-muted-foreground" :title="record.content">
               {{ record.type === "MX" && record.priority != null ? `${record.priority} ${record.content}` : record.content }}

@@ -315,6 +315,64 @@ export interface DnsRecordRow {
   editable: boolean
 }
 
+export interface MailTodayLogEntry {
+  date: string
+  qid: string
+  sender: string
+  total_recp: string | number
+  size: string
+}
+
+export interface MailAuthFailLogEntry {
+  notes: string
+  date: string
+  ip: string
+  // cuma ada di ImapLogs, tidak ada di SaslLogs
+  email?: string
+  // cuma ada di SaslLogs (jumlah percobaan per IP), tidak ada di ImapLogs
+  count?: number
+}
+
+export interface MailQueueItem {
+  id: string
+  size: string
+  rawdate: string
+  sender: string
+  recipient: string
+  reason: string
+  status: "active" | "deferred"
+}
+
+export interface MailImapLogEntry {
+  date: string
+  email: string
+  ip: string
+}
+
+export interface MailQueueResponse {
+  count: number
+  page: number
+  results: MailQueueItem[]
+  next: number | null
+  previous: number | null
+  imaplogs: MailImapLogEntry[]
+  total_count: number
+  active_count: number
+  deferred_count: number
+}
+
+export interface MailTransportRow {
+  domain: string
+  target: string
+  status: "0" | "1"
+}
+
+export interface MailBlockedSenderRow {
+  email: string
+  action: string
+  status: "0" | "1"
+}
+
 export interface Department {
   DeptID: number
   DeptName: string

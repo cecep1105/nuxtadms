@@ -3,5 +3,5 @@ import { cn } from "@/lib/utils"
 const props = defineProps<{ class?: string; colspan?: number }>()
 </script>
 <template>
-  <td :class="cn('p-3 align-middle', props.class)" :colspan="props.colspan"><slot /></td>
+  <td :class="cn('px-3 py-0.5 align-middle', props.class)" :colspan="props.colspan"><slot /></td>
 </template>
