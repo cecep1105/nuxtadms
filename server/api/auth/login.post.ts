@@ -14,6 +14,8 @@
  * EKSPLISIT + di-log server-side (muncul di terminal `npm run dev`)
  * supaya penyebab SEBENARNYA kelihatan.
  */
+import { useSession } from "h3"
+
 export default defineEventHandler(async (event) => {
   const { username, password } = await readBody<{ username: string; password: string }>(event)
   const config = useRuntimeConfig()
@@ -44,29 +46,38 @@ export default defineEventHandler(async (event) => {
   }
 
 
-  // ⚠️ BUG YANG SUDAH DIPERBAIKI (login gagal setelah logout/sesi
-  // expired, kecuali cookie dihapus manual): setUserSession() TERNYATA
-  // MEN-*MERGE* data baru dgn sesi LAMA (defu(data, session.data) --
-  // lihat node_modules/nuxt-auth-utils/dist/runtime/server/utils/session.js),
-  // BUKAN replace penuh. Kalau sesi lama py field `error:
-  // "RefreshTokenError"` (dari session-refresh.ts, ditandai saat
-  // refresh token JUGA sudah expired) & TIDAK di-override eksplisit
-  // oleh data login baru, field itu TETAP NEMPEL ke sesi baru --
-  // middleware (checknya: `!session.value?.error`) terus anggap
-  // "belum login" walau login API-nya BENAR-BENAR sukses & token BARU
-  // valid, user KE-REDIRECT TERUS ke /login (kelihatan spt "tidak bisa
-  // login").
+  // ⚠️ BUG SESUNGGUHNYA (baru ketahuan setelah investigasi mendalam ke
+  // source code h3, BUKAN cuma nuxt-auth-utils): replaceUserSession()
+  // internal-nya manggil session.clear() LALU session.update(data) --
+  // TAPI clear() cuma menghapus event.context.sessions[name] dari
+  // MEMORI request ini, TIDAK bisa "menghapus" cookie yang SUDAH
+  // TERLANJUR ada di REQUEST MASUK (Cookie header itu immutable dalam
+  // 1 request). Giliran update() jalan: dia cek
+  // `event.context.sessions?.[name] || await getSession(...)` --
+  // krn barusan DIHAPUS clear(), jatuh ke fallback getSession(), YANG
+  // BACA ULANG COOKIE DARI REQUEST & UNSEAL DATA LAMA (lengkap dgn
+  // field `error` yg mau dibuang)! update() lalu Object.assign() data
+  // BARU ke atas data LAMA yg baru saja "dihidupkan lagi" itu -- field
+  // `error` yg TIDAK ada di data baru TETAP nempel dari hasil unseal
+  // ulang tsb. Ini KENAPA percobaan replaceUserSession() SEBELUMNYA
+  // TETAP GAGAL walau secara nama terdengar "replace penuh".
   //
-  // Percobaan pertama saya perbaiki dgn clearUserSession(event) lalu
-  // setUserSession(event, ...) terpisah -- SECARA TEORI harusnya cukup
-  // (clear dulu baru merge dgn sesi kosong = sama dgn replace), TAPI
-  // 2 panggilan terpisah ini masing2 manggil _useSession(event) SENDIRI
-  // -- TIDAK ada jaminan keduanya reuse instance sesi yang PERSIS sama
-  // dalam 1 request scope yg sama, jadi TETAP bisa gagal di kondisi
-  // tertentu. replaceUserSession() jauh LEBIH AMAN krn clear+update
-  // dilakukan ATOMIK dlm SATU pemanggilan _useSession(), pakai SATU
-  // instance sesi yg sama -- TIDAK ada celah utk sisa data lama nempel.
-  await replaceUserSession(event, {
+  // setUserSession() JUGA tidak bisa dipakai sbg pengganti -- dia
+  // pakai defu(data, session.data), & defu SECARA SENGAJA skip value
+  // null MAUPUN undefined saat merge (lihat node_modules/defu/dist/defu.mjs:
+  // `if (value === null || value === void 0) continue`) -- SET
+  // `error: null` atau `error: undefined` scr eksplisit di data baru
+  // SAMA SEKALI TIDAK membantu, defu tetap jatuh ke nilai LAMA.
+  //
+  // FIX SESUNGGUHNYA: kosongkan session.data SECARA IN-PLACE (hapus
+  // semua key-nya SATU PER SATU, TANPA memanggil .clear() yg
+  // menghapus REFERENSI objeknya dari event.context.sessions), BARU
+  // panggil .update(data) -- krn objek session-nya TIDAK PERNAH benar2
+  // dihapus dari event.context.sessions, updateSession() TIDAK PERNAH
+  // jatuh ke fallback getSession() yg baca ulang cookie lama itu.
+  const session = await useSession(event, useRuntimeConfig().session as Parameters<typeof useSession>[1])
+  for (const key of Object.keys(session.data)) delete (session.data as Record<string, unknown>)[key]
+  await session.update({
     user: data.user as any,
     accessToken: data.access,
     refreshToken: data.refresh,
