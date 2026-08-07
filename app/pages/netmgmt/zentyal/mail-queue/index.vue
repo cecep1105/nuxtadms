@@ -40,7 +40,10 @@ const { data, pending, error } = await useAsyncData(
             <Badge variant="warning" class="gap-1">Deferred <span class="font-tabular font-semibold">{{ data.deferred_count }}</span></Badge>
           </div>
         </div>
-        <MailQueueRefreshButton />
+        <div class="flex items-center gap-3">
+          <MailQueueLiveRefresher />
+          <MailQueueRefreshButton />
+        </div>
       </div>
 
       <div v-if="pending" class="p-8 text-center text-sm text-muted-foreground">Memuat...</div>
