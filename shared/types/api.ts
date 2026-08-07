@@ -492,6 +492,11 @@ export interface RouterChoice {
   ip_router: string
 }
 
+export interface PhotoBoxConfig {
+  width: number
+  height: number
+}
+
 export interface Department {
   DeptID: number
   DeptName: string

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Loader2, Search, User, Users, CheckCircle2 } from "@lucide/vue"
+import { Loader2, Search, User, Users, CheckCircle2, Wand2 } from "@lucide/vue"
 import type { IDCardType, IDCardTemplate, IDCardHolder, IDCardPhotoCandidate, IDCardDetail } from "#shared/types/api"
 
 const CARD_TYPES: { value: IDCardType; label: string }[] = [
@@ -37,6 +37,11 @@ const holderId = ref("")
 // --- Foto & extra ---
 const photoDataUri = ref<string | null>(null)
 const photoSource = ref<"ftp" | "shoot" | "upload">("shoot")
+const retouchOpen = ref(false)
+
+function handleRetouched(dataUri: string) {
+  photoDataUri.value = dataUri
+}
 const extraText = ref("")
 
 const generating = ref(false)
@@ -247,10 +252,22 @@ async function handleGenerate() {
           </div>
         </div>
 
-        <div v-if="photoDataUri && photoSource !== 'ftp'">
+        <div v-if="photoDataUri" class="border-t border-border pt-3">
           <p class="mb-1 text-xs font-medium text-muted-foreground">Foto terpilih:</p>
-          <img :src="photoDataUri" alt="Foto terpilih" class="w-24 rounded-md border border-border" />
+          <div class="flex items-center gap-3">
+            <img :src="photoDataUri" alt="Foto terpilih" class="w-24 rounded-md border border-border" />
+            <Button type="button" variant="outline" size="sm" @click="retouchOpen = true">
+              <Wand2 class="h-3.5 w-3.5" /> Retouch
+            </Button>
+          </div>
+          <p class="mt-1 text-[11px] text-muted-foreground">Posisi kurang pas? Geser/zoom foto lewat Retouch sebelum generate kartu.</p>
         </div>
+
+        <PhotoRetouchDialog
+          v-model:open="retouchOpen" :source-image="photoDataUri ?? ''"
+          :pin="isEmployeeLinked ? employeeFound?.pin : undefined"
+          @retouched="handleRetouched"
+        />
       </Card>
     </div>
 
