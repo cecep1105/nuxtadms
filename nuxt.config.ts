@@ -114,6 +114,16 @@ export default defineNuxtConfig({
       // PoolLocationMapDrawer.vue (fitur gambar polygon geofence di
       // peta). Aktifkan "Maps JavaScript API" di Google Cloud Console.
       googleMapsApiKey: '',
+      // Fallback PALING AKHIR (dipakai kalau admin belum set default via
+      // Django Admin NetmgmtRouterDefault DAN user belum pilih router
+      // lain lewat dropdown RouterSelector) -- MENJAGA KOMPATIBILITAS
+      // dgn setup lama sebelum fitur dropdown ini ada.
+      mikrotikDhcpRouterIp: '10.100.202.254',
+      mikrotikFwfilterRouterIp: '10.100.202.254',
+      // IP router netwatch BEDA dari dhcp/fwfilter (.1 vs .254) --
+      // KEMUNGKINAN BESAR memang 2 router fisik BERBEDA (bukan salah
+      // ketik), makanya config-nya SENGAJA dipisah per-halaman.
+      mikrotikNetwatchRouterIp: '10.100.202.1',
     },
   },
 
