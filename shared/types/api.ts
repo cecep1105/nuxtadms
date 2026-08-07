@@ -603,6 +603,11 @@ export interface EmployeeSearchResult {
   name: string
 }
 
+export interface PoolDeviceChoicesResponse {
+  pools: { id: number; name: string }[]
+  devices?: { sn: string; name: string }[]
+}
+
 export interface FeaturePermissionItem {
   codename: string
   label: string
