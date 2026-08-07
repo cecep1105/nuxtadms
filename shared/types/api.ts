@@ -373,54 +373,73 @@ export interface MailBlockedSenderRow {
   status: "0" | "1"
 }
 
-export interface MikrotikDhcpLease {
-  id: string
-  address: string
-  "mac-address": string
-  server: string
-  status: "bound" | "waiting" | "testing"
-  "last-seen": string
-  "host-name"?: string
-  dynamic: "true" | "false"
-  disabled: "true" | "false"
+export type IDCardType = "karyawan" | "driver" | "visitor" | "bhl"
+export type IDCardPhotoSource = "ftp" | "shoot" | "upload"
+export type IDCardStatus = "belum_cetak" | "sudah_cetak" | "hilang" | "cetak_ulang"
+
+export interface IDCardTemplate {
+  id: number
+  card_type: IDCardType
+  name: string
+  background_image: string
+  is_active: boolean
+  created_at: string
+  updated_at: string
 }
 
-export type MikrotikFirewallChain = "input" | "forward" | "output"
-export type MikrotikFirewallAction = "accept" | "drop" | "reject" | "log" | "jump" | "return" | "passthrough" | string
-
-export interface MikrotikFirewallFilterRule {
-  id: string
-  chain: MikrotikFirewallChain
-  action: MikrotikFirewallAction
-  "in-interface"?: string
-  "out-interface"?: string
-  "src-mac-address"?: string
-  "in-interface-list"?: string
-  "out-interface-list"?: string
-  protocol?: string
-  "dst-port"?: string
-  src?: string
-  comment?: string
-  bytes?: string
-  disabled?: "true" | "false"
+export interface IDCardHolder {
+  id: number
+  card_type: "visitor" | "bhl"
+  full_name: string
+  id_number: string
+  company: string
+  purpose: string
+  photo: string | null
+  valid_from: string | null
+  valid_until: string | null
+  created_at: string
+  updated_at: string
 }
 
-export interface RouterChoice {
-  dept_name: string
-  ip_router: string
+export interface IDCardLogEntry {
+  id: number
+  status: IDCardStatus
+  status_label: string
+  notes: string
+  changed_by_username: string | null
+  changed_at: string
 }
 
-export interface MikrotikNetwatchItem {
-  id: string
-  host: string
-  status: "up" | "down" | "waiting" | "initializing"
-  since: string
-  interval: string
-  timeout: string
-  comment?: string
-  disabled: "true" | "false"
-  "up-script"?: string
-  "down-script"?: string
+export interface IDCardListItem {
+  id: number
+  card_type: IDCardType
+  card_type_label: string
+  holder_name: string
+  holder_identifier: string
+  template_name: string
+  photo_source: IDCardPhotoSource
+  card_image: string
+  status: IDCardStatus
+  status_label: string
+  generated_at: string
+}
+
+export interface IDCardDetail extends IDCardListItem {
+  photo: string
+  template: number
+  employee_id: number | null
+  holder_id: number | null
+  logs: IDCardLogEntry[]
+}
+
+export interface IDCardPhotoCandidate {
+  counter: number
+  dir?: string
+  path: string
+  data: string
+  pin: string
+  source: string
+  label?: string
 }
 
 export interface Department {
