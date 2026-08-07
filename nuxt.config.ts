@@ -102,6 +102,10 @@ export default defineNuxtConfig({
       apiBaseUrl: 'http://127.0.0.1:8000/api/v1',
       mediaUrl: '',
       wsBaseUrl: '',
+      // Override via NUXT_PUBLIC_GOOGLE_MAPS_API_KEY -- dipakai
+      // PoolLocationMapDrawer.vue (fitur gambar polygon geofence di
+      // peta). Aktifkan "Maps JavaScript API" di Google Cloud Console.
+      googleMapsApiKey: '',
     },
   },
 
@@ -116,6 +120,15 @@ export default defineNuxtConfig({
 
   typescript: {
     strict: true,
+    // Registrasi tipe global google.maps.* (paket @types/google.maps) --
+    // dipakai PoolLocationMapDrawer.vue. Tanpa ini, tsconfig auto-generate
+    // Nuxt TIDAK otomatis include paket @types/* pihak ketiga di luar yg
+    // Nuxt sendiri butuhkan.
+    tsConfig: {
+      compilerOptions: {
+        types: ['google.maps'],
+      },
+    },
   },
   
 })

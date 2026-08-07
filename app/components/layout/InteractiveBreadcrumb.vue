@@ -80,7 +80,12 @@ function findBreadcrumb(pathname: string): BreadcrumbSegment[] {
  * PAKSA tertutup (openKey = null) SETIAP KALI route berubah -- jaminan
  * ini TIDAK bergantung pada detail teknis persis kenapa state bisa
  * "kebawa" (persistence layout, quirk SSR/hydration, dst), SELALU
- * benar utk SEMUA skenario navigasi.
+ * benar utk SEMUA skenario navigasi. DITAMBAH: max-h-72 overflow-y-auto
+ * di DropdownMenuContent -- trigger breadcrumb ada DEKAT SEKALI dgn
+ * tepi ATAS viewport (topbar), CSS var bawaan reka-ui utk max-height
+ * OTOMATIS jadi SANGAT BESAR dari posisi ini (nyaris setinggi viewport)
+ * -- kotak dropdown jadi tinggi & nyaris kosong, kelihatan spt "menu
+ * sidebar nyasar ke breadcrumb" di screenshot yang dilaporkan.
  */
 const route = useRoute()
 const segments = computed(() => findBreadcrumb(route.path))
@@ -122,7 +127,7 @@ watch(() => route.path, () => { openKey.value = null })
           {{ segment.label }}
           <ChevronDown class="h-3 w-3 shrink-0 opacity-60" />
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start">
+        <DropdownMenuContent align="start" class="max-h-72 overflow-y-auto">
           <DropdownMenuItem
             v-for="opt in segment.options" :key="opt.label" as-child
             :class="opt.isCurrent ? 'bg-accent' : ''"

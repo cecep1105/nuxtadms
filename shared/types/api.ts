@@ -103,6 +103,70 @@ export interface Employee {
   LastDevice: string | null
 }
 
+export interface MobilePool {
+  PoolID: string
+  PoolCode: string | null
+  PoolName: string | null
+  Latitude: string | null
+  Longitude: string | null
+  Radius: number | null
+  SyncedAt: string | null
+}
+
+export interface MobilePoolLoc {
+  id: number
+  PoolID: string
+  Urut: number
+  Latitude: string
+  Longitude: string
+}
+
+export interface PoolDeviceFunction {
+  id: number
+  PoolID: string
+  function_type: "KANTIN" | "BUKAN_KANTIN"
+  created_at: string
+  updated_at: string
+}
+
+export interface AttendanceLog {
+  id: number
+  username: string
+  timestamp: string
+  check_type: string
+  check_type_display: string
+  pool_id: string | null
+  pool_name: string | null
+  location_verified: boolean
+  face_verified: boolean
+  face_distance: number | null
+  qr_content: string | null
+  Function: string | null
+}
+
+export interface FaceProfile {
+  id: number
+  pin: string
+  employee_name: string | null
+  is_locked: boolean
+  enrolled_at: string
+  updated_at: string
+}
+
+export interface MobileAttendanceSource {
+  slug: string
+  title: string
+}
+
+export interface MobileAttendanceRow {
+  Id: number
+  sn: string
+  nik: string
+  ttime: string
+  ctype: string
+  bProses: number
+}
+
 export interface Department {
   DeptID: number
   DeptName: string
