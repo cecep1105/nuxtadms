@@ -167,6 +167,26 @@ export interface MobileAttendanceRow {
   bProses: number
 }
 
+export interface CloudflareZone {
+  id: string
+  name: string
+  status: string
+  paused: boolean
+}
+
+export type CloudflareRecordType = "A" | "AAAA" | "CNAME" | "MX" | "TXT" | "NS"
+
+export interface CloudflareDnsRecord {
+  id: string
+  type: string
+  name: string
+  content: string
+  ttl: number
+  proxied: boolean
+  proxiable: boolean
+  priority: number | null
+}
+
 export interface Department {
   DeptID: number
   DeptName: string
