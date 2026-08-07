@@ -46,9 +46,26 @@ const { data, pending, error } = await useAsyncData(
         </div>
       </div>
 
-      <div v-if="pending" class="p-8 text-center text-sm text-muted-foreground">Memuat...</div>
-      <div v-else-if="error" class="p-8 text-center text-sm text-destructive">Gagal memuat data: {{ error.message }}</div>
-      <Table v-else>
+      <!-- ⚠️ BUG YANG SUDAH DIPERBAIKI (tabel terlihat "dikosongkan lalu
+           diisi" tiap kali live-refresh WebSocket jalan, MENGGANGGU --
+           Next.js versi lama TIDAK begini): SEBELUMNYA kondisi di sini
+           cuma `v-if="pending"` -- `pending` dari useAsyncData KEMBALI
+           true SETIAP KALI refreshNuxtData() dipanggil (BUKAN cuma saat
+           load PERTAMA kali), jadi tabel yang SUDAH terisi data ikut
+           DIGANTI SEMENTARA jadi teks "Memuat..." tiap ~1 menit
+           (broadcast mailq), padahal DATA LAMA MASIH ADA & SAH utk
+           ditampilkan selagi data BARU sedang diambil -- flicker ini
+           PERSIS yang dilaporkan.
+           FIX: tambahkan `&& !data` -- loading text HANYA muncul saat
+           BENAR-BENAR belum ada data sama sekali (load pertama kali),
+           SETELAH itu tabel LAMA tetap tampil TANPA terganti apa pun
+           selama refresh background jalan, baru diam-diam berganti ke
+           data BARU begitu selesai (Vue reactivity + :key per baris
+           yang SUDAH benar bikin transisinya halus, HANYA sel yang
+           ISINYA beneran berubah yang ke-update di DOM). -->
+      <div v-if="pending && !data" class="p-8 text-center text-sm text-muted-foreground">Memuat...</div>
+      <div v-else-if="error && !data" class="p-8 text-center text-sm text-destructive">Gagal memuat data: {{ error.message }}</div>
+      <Table v-else-if="data">
         <TableHeader>
           <TableRow>
             <TableHead><RouterOSSortableHeader column-key="id" label="Queue ID" /></TableHead>
@@ -80,7 +97,7 @@ const { data, pending, error } = await useAsyncData(
           </TableRow>
         </TableBody>
       </Table>
-      <PaginationBar v-if="!pending && !error" :count="data?.count ?? 0" :page-size="pageSize" :current-page="Number(route.query.page ?? '1')" />
+      <PaginationBar v-if="data" :count="data?.count ?? 0" :page-size="pageSize" :current-page="Number(route.query.page ?? '1')" />
     </Card>
   </div>
 </template>
