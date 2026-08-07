@@ -256,6 +256,65 @@ export interface ITInfraEntryDetail extends ITInfraEntrySummary {
   data: Record<string, string>
 }
 
+export interface DirectoryUser {
+  dn: string
+  username: string
+  display_name: string
+  email: string
+  // Cuma ADA di AD (userAccountControl decoded) -- undefined utk Zentyal.
+  is_enabled?: boolean
+  // Cuma ADA di AD (lockoutTime decoded) -- TERKUNCI OTOMATIS krn salah
+  // password berkali-kali, BEDA dari is_enabled (dinonaktifkan MANUAL).
+  is_locked?: boolean
+  locked_at?: string | null
+  // Cuma ADA di Zentyal (posixAccount) -- undefined utk AD.
+  uid_number?: string
+  gid_number?: string
+  home_directory?: string
+}
+
+export interface DirectoryGroup {
+  dn: string
+  name: string
+  description: string
+  member_count: number
+  // Cuma ADA di Zentyal ('posix'|'distribution') -- undefined utk AD.
+  kind?: "posix" | "distribution"
+}
+
+export type DnsZonePartition = "forest" | "domain" | "legacy"
+export type DnsRecordType = "A" | "AAAA" | "CNAME" | "MX" | "SRV" | "TXT" | "NS" | "PTR"
+
+export interface DnsZone {
+  dn: string
+  name: string
+  partition: DnsZonePartition
+}
+
+// `data` bentuknya beda per `type` (A/AAAA: address, CNAME/NS/PTR:
+// target, MX: preference+exchange, SRV: priority+weight+port+target,
+// TXT: text).
+export interface DnsRecordData {
+  address?: string
+  target?: string
+  preference?: number
+  exchange?: string
+  priority?: number
+  weight?: number
+  port?: number
+  text?: string
+}
+
+export interface DnsRecordRow {
+  node_dn: string
+  name: string
+  type: string
+  ttl_seconds: number
+  data: DnsRecordData
+  raw_b64: string
+  editable: boolean
+}
+
 export interface Department {
   DeptID: number
   DeptName: string
