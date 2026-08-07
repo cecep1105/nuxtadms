@@ -629,6 +629,29 @@ export interface DjangoApiUser {
   is_staff: boolean
   is_superuser: boolean
   must_change_password: boolean
+  created_at: string
+  updated_at: string
+  // Izin fitur granular utk user NON-staff (lihat iclock/models.py::
+  // FeaturePermission & dashboard Django "Kelola Izin User") -- staff/
+  // superuser SELALU true. Dipakai Portal (hub) utk tentukan kartu menu
+  // mana yang ditampilkan ke user ini.
+  can_transfer_finger: boolean
+  can_view_attendance_recap: boolean
+  can_view_attendance_recap_kantin: boolean
+  can_view_attendance_recap_driver: boolean
+  can_view_dhcp_lease: boolean
+  can_view_fwfilter: boolean
+  can_view_netwatch: boolean
+  can_view_ad_users: boolean
+  can_view_ad_locked_users: boolean
+  can_view_ad_dns: boolean
+  can_view_ad_groups: boolean
+  can_view_zentyal_users: boolean
+  can_view_zentyal_groups: boolean
+  can_view_cloudflare: boolean
+  can_view_itinfra: boolean
+  can_view_idcard: boolean
+  can_view_active_device: boolean
   emp_pin: string | null
   emp_name: string | null
   has_employee_link: boolean
