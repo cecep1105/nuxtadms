@@ -234,6 +234,28 @@ export interface VmwareVmDetail {
   datastores: VmwareDatastore[]
 }
 
+export interface ITInfraCategory {
+  id: number
+  name: string
+}
+
+// Bentuk RINGKAS (list) -- SENGAJA TANPA field `data` (password dkk
+// TIDAK ikut terkirim di endpoint list, cuma di endpoint detail).
+export interface ITInfraEntrySummary {
+  id: number
+  category_id: number
+  category_name: string
+  name: string
+  notes: string
+  is_staff_only: boolean
+  updated_at: string
+}
+
+// Bentuk LENGKAP (detail 1 entry) -- BARU py field `data`.
+export interface ITInfraEntryDetail extends ITInfraEntrySummary {
+  data: Record<string, string>
+}
+
 export interface Department {
   DeptID: number
   DeptName: string
