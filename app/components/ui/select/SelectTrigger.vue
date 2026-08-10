@@ -6,28 +6,40 @@ import { reactiveOmit } from "@vueuse/core"
 import { SelectIcon, SelectTrigger, useForwardProps } from "reka-ui"
 import { cn } from "@/lib/utils"
 
-const props = withDefaults(
-  defineProps<SelectTriggerProps & { class?: HTMLAttributes["class"], size?: "sm" | "default" }>(),
-  { size: "default" },
-)
+/**
+ * ⚠️ DITULIS ULANG SEPENUHNYA (bukan tambal sulam per-properti lagi) --
+ * versi SEBELUMNYA campuran dari template shadcn-vue STANDAR/lebih
+ * BARU (data-[size=*], dark:bg-input/30, aria-invalid:*, w-fit, dst --
+ * SEMUA properti ini TIDAK ADA di select.tsx Next.js proyek ini) yang
+ * TIDAK PERNAH sepenuhnya diselaraskan ke select.tsx Next.js -- setiap
+ * kali 1 properti diperbaiki (tinggi, lalu text-size), masih ADA
+ * properti lain yang beda (w-fit vs w-full, dark:bg-input/30 vs
+ * bg-background polos) krn PENDEKATAN tambal-sulam tidak pernah
+ * membandingkan FILE UTUH.
+ *
+ * Sekarang: class di bawah adalah TERJEMAHAN LITERAL, baris-per-baris,
+ * dari select.tsx Next.js (dicek ulang LANGSUNG dari file lengkapnya).
+ * Prop `size` (variant sm/default) DIHAPUS -- tidak ada konsepnya di
+ * Next.js sama sekali, DAN sudah dikonfirmasi tidak pernah dipakai di
+ * mana pun di codebase Nuxt ini (grep kosong).
+ */
+const props = defineProps<SelectTriggerProps & { class?: HTMLAttributes["class"] }>()
 
-const delegatedProps = reactiveOmit(props, "class", "size")
+const delegatedProps = reactiveOmit(props, "class")
 const forwardedProps = useForwardProps(delegatedProps)
 </script>
 
 <template>
   <SelectTrigger
-    data-slot="select-trigger"
-    :data-size="size"
     v-bind="forwardedProps"
     :class="cn(
-      `border-input data-[placeholder]:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 dark:hover:bg-input/50 flex w-fit items-center justify-between gap-2 rounded-md border bg-background px-2.5 py-1 text-sm whitespace-nowrap shadow-sm transition-colors outline-none focus-visible:ring-1 disabled:cursor-not-allowed disabled:opacity-50 data-[size=default]:h-8 data-[size=sm]:h-7 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4`,
+      'flex h-8 w-full items-center justify-between rounded-md border border-input bg-background px-2.5 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 *:data-[slot=select-value]:line-clamp-1',
       props.class,
     )"
   >
     <slot />
     <SelectIcon as-child>
-      <ChevronDown class="size-4 opacity-50" />
+      <ChevronDown class="h-4 w-4 opacity-50" />
     </SelectIcon>
   </SelectTrigger>
 </template>

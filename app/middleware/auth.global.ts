@@ -33,11 +33,30 @@ export default defineNuxtRouteMiddleware(async (to) => {
   const isPortalPath = to.path === PORTAL_PREFIX || to.path.startsWith(`${PORTAL_PREFIX}/`)
   const isIdCardPrintPath = to.path.startsWith(IDCARD_PRINT_PREFIX)
 
-  // console.log(`[auth.global] middleware: isLoggedIn=${isLoggedIn}, isLoginPage=${isLoginPage}, isStaff=${isStaff}, isPortalPath=${isPortalPath}, isIdCardPrintPath=${isIdCardPrintPath}, to.path=${to.path}`)
-
-  console.log(isLoggedIn)
-
   if (!isLoggedIn && !isLoginPage) {
+    const loginPath = `/login?callbackUrl=${encodeURIComponent(to.fullPath)}`
+    // ⚠️ FIX bug (dilaporkan user): navigasi client-side biasa
+    // (navigateTo()) dari halaman ber-layout (dashboard/portal, PAKAI
+    // Sidebar) ke /login (layout: false) TERBUKTI bikin grid responsif
+    // login.vue (lg:grid-cols-2) RUSAK SESAAT (padding hilang di sisi
+    // kiri, sisi kanan lebih kecil dari seharusnya) -- KHUSUS saat
+    // trigger-nya session expire (navigasi client-side dari middleware
+    // ini), TIDAK terjadi kalau user klik "Keluar" manual (beda
+    // mekanisme, lihat PortalHeader.vue/Topbar.vue: logout MEMANG
+    // sudah pakai window.location.href, BUKAN navigateTo()) ATAUPUN
+    // saat refresh manual (full page load, SELALU render benar).
+    //
+    // FIX: SAMAKAN pola dgn login.vue & tombol logout -- pakai hard
+    // navigation (window.location.href) utk redirect KE /login SAAT
+    // trigger-nya dari CLIENT (session expire terdeteksi di tengah
+    // sesi browsing) -- SISI SERVER (SSR, akses URL protected LANGSUNG
+    // tanpa sesi) TETAP pakai navigateTo() (window TIDAK ADA saat SSR,
+    // DAN kasus itu MEMANG sudah full page load dari awal, tidak
+    // relevan dgn bug transisi client-side ini).
+    if (import.meta.client) {
+      window.location.href = loginPath
+      return abortNavigation()
+    }
     return navigateTo({ path: "/login", query: { callbackUrl: to.fullPath } })
   }
 
