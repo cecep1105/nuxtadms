@@ -3,6 +3,7 @@ import { Network, ChevronDown } from "@lucide/vue"
 import { navGroups, nonStaffNavGroups } from "@/lib/nav-config"
 import { groupContainsPath, collectActiveKeys } from "@/lib/nav-helpers"
 import { cn } from "@/lib/utils"
+import { Icon } from '@iconify/vue'
 
 /**
  * Konten sidebar yang SESUNGGUHNYA (logo + nav) -- dipisah dari
@@ -44,10 +45,14 @@ function toggleGroup(label: string) {
 <template>
   <div class="sidebar-shell flex h-full flex-col bg-card">
     <div :class="cn('flex h-12 shrink-0 items-center gap-2 border-b border-border', collapsed ? 'justify-center px-2' : 'px-4')">
-      <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-primary/15">
-        <Network class="h-3.5 w-3.5 text-primary" />
+      <div
+        class="flex h-8 w-14 shrink-0 items-center justify-center gap-0.5 rounded-md bg-primary/15"
+        aria-label="Nuxt network"
+      >
+        <Icon icon="simple-icons:nuxtdotjs" class="h-6 w-6 text-primary" />
+        <Network class="h-4 w-4 text-primary/75" />
       </div>
-      <span v-if="!collapsed" class="truncate font-display text-sm font-semibold tracking-tight">NUXTADMS</span>
+    <span v-if="!collapsed" class="truncate font-display text-sm font-semibold tracking-tight text-foreground">NUXTADMS</span>
     </div>
 
     <nav class="flex-1 space-y-1 overflow-y-auto px-2 py-3">

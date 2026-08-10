@@ -16,7 +16,7 @@ const { collapsed, toggle } = useSidebar()
       <div class="min-h-0 flex-1">
         <SidebarContent :collapsed="collapsed" />
       </div>
-      <div :class="cn('flex shrink-0 border-t border-border bg-card p-2', collapsed ? 'justify-center' : 'justify-end')">
+      <div :class="cn('flex shrink-0 border-t border-border bg-card p-2 text-foreground', collapsed ? 'justify-center' : 'justify-end')">
         <Button variant="ghost" size="icon" :aria-label="collapsed ? 'Perluas sidebar' : 'Ciutkan sidebar'" @click="toggle">
           <component :is="collapsed ? ChevronsRight : ChevronsLeft" class="h-3.5 w-3.5" />
         </Button>

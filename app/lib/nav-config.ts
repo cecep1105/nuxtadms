@@ -42,7 +42,7 @@ export const navGroups: NavGroup[] = [
     items: [{ title: "Manajemen User", href: "/users", icon: Users }],
   },
   {
-    label: "iClock — Device & Absensi",
+    label: "Finger Attendance",
     icon: Cpu,
     items: [
       { title: "Pool / Department", href: "/iclock/departments", icon: Building2 },
@@ -69,7 +69,7 @@ export const navGroups: NavGroup[] = [
     ],
   },
   {
-    label: "Infrastructure Management",
+    label: "IT Infrastructure",
     icon: Router,
     items: [
       {
