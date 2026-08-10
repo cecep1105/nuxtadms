@@ -91,7 +91,7 @@ const { data, pending, error } = await useAsyncData(
             <TableCell class="text-muted-foreground">{{ item.size }}</TableCell>
             <TableCell class="text-muted-foreground">{{ item.rawdate }}</TableCell>
             <TableCell class="text-muted-foreground">{{ item.sender }}</TableCell>
-            <TableCell class="max-w-xs truncate text-muted-foreground" :title="item.recipient">{{ item.recipient }}</TableCell>
+            <TableCell class="max-w-xs text-muted-foreground"><RecipientListPopover :recipient="item.recipient" /></TableCell>
             <TableCell class="max-w-xs truncate text-muted-foreground" :title="item.reason">{{ item.reason || "-" }}</TableCell>
             <TableCell><QueueItemActions :qid="item.id" /></TableCell>
           </TableRow>
