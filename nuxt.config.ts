@@ -133,6 +133,32 @@ export default defineNuxtConfig({
       meta: [
         { name: 'description', content: 'Konsol manajemen infrastruktur IT: Active Directory, jaringan, mail server, ID card, device fingerprint, dan mobile attendance.' },
       ],
+      script: [
+        {
+          // ⚠️ FIX FOUC dark mode (halaman kedip light->dark sesaat tiap
+          // refresh manual saat posisi dark -- Next.js/next-themes TIDAK
+          // begini krn next-themes OTOMATIS inject script blocking spt ini,
+          // VueUse useDark() TIDAK melakukan itu sendiri) --
+          // ThemeToggle.vue pakai useDark() VueUse APA ADANYA (tanpa
+          // opsi), yang BERARTI baca localStorage & apply class 'dark' ke
+          // <html> BARU terjadi saat Vue hydrate di CLIENT (localStorage
+          // tidak ada saat SSR) -- HTML awal SELALU terkirim tanpa class
+          // 'dark' dulu (browser sempat paint LIGHT), baru SETELAH
+          // hydration jalan, class 'dark' ditambahkan -- itu KEDIPnya.
+          //
+          // Script INI jalan SEBAGAI SCRIPT BLOCKING PALING AWAL di <head>
+          // (SEBELUM CSS/apapun dirender), baca localStorage & apply class
+          // 'dark' SECARA SINKRON SEBELUM browser sempat paint apa pun --
+          // TIDAK ADA lagi jeda utk mata manusia lihat kedipnya. Key
+          // ('vueuse-color-scheme') & logic (auto -> ikut
+          // prefers-color-scheme) PERSIS SAMA dgn default useColorMode()
+          // milik VueUse (dipakai internal oleh useDark()) -- WAJIB selalu
+          // disinkronkan kalau opsi useDark() di ThemeToggle.vue nanti
+          // diubah dari default.
+          innerHTML: `(function(){try{var s=localStorage.getItem('vueuse-color-scheme')||'auto';var d=s==='dark'||(s==='auto'&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d)document.documentElement.classList.add('dark')}catch(e){}})();`,
+          tagPriority: 'critical',
+        },
+      ],
     },
   },
 
