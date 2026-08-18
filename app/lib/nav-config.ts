@@ -91,6 +91,7 @@ export const navGroups: NavGroup[] = [
           { title: "SASL Logs", href: "/netmgmt/zentyal/sasl-logs", icon: ScrollText },
           { title: "Users", href: "/netmgmt/zentyal/users", icon: Users },
           { title: "Groups", href: "/netmgmt/zentyal/groups", icon: Users },
+          { title: "Postfix Alias", href: "/netmgmt/zentyal/postfix-alias", icon: Users },
         ],
       },
       {

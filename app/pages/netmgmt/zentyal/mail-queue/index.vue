@@ -21,6 +21,43 @@ const { data, pending, error } = await useAsyncData(
   () => request<MailQueueResponse>(`/netmgmt/zentyal-mail/queue/?${query.value}`),
   { watch: [query] }
 )
+
+
+type ErrorCode =
+  | 'DISABLED'
+  | 'HNF'
+  | 'DISK'
+  | 'NRH'
+  | 'T-OUT'
+  | 'REFUSED'
+  | 'UNREACH'
+  | 'INVALID'
+  | 'OTHER'
+  | '';
+
+const ERROR_RULES: readonly [keyword: string, code: ErrorCode][] = [
+  ['disabled', 'DISABLED'],
+  ['host not found', 'HNF'],
+  ['out of storage', 'DISK'],
+  ['no route to host', 'NRH'],
+  ['timed out', 'T-OUT'],
+  ['refused', 'REFUSED'],
+  ['unreachable', 'UNREACH'],
+  ['invalid', 'INVALID'],
+];
+
+function errorReason(reason: string): ErrorCode {
+  const normalized = reason.trim().toLowerCase();
+
+  if (!normalized) return '';
+
+  return (
+    ERROR_RULES.find(([keyword]) => normalized.includes(keyword))?.[1] ??
+    'OTHER'
+  );
+}
+
+
 </script>
 
 <template>
@@ -65,38 +102,53 @@ const { data, pending, error } = await useAsyncData(
            ISINYA beneran berubah yang ke-update di DOM). -->
       <div v-if="pending && !data" class="p-8 text-center text-sm text-muted-foreground">Memuat...</div>
       <div v-else-if="error && !data" class="p-8 text-center text-sm text-destructive">Gagal memuat data: {{ error.message }}</div>
-      <Table v-else-if="data">
-        <TableHeader>
-          <TableRow>
-            <TableHead><RouterOSSortableHeader column-key="id" label="Queue ID" /></TableHead>
-            <TableHead><RouterOSSortableHeader column-key="status" label="Status" /></TableHead>
-            <TableHead><RouterOSSortableHeader column-key="size" label="Ukuran" /></TableHead>
-            <TableHead><RouterOSSortableHeader column-key="rawdate" label="Tanggal" /></TableHead>
-            <TableHead><RouterOSSortableHeader column-key="sender" label="Pengirim" /></TableHead>
-            <TableHead>Penerima</TableHead>
-            <TableHead>Alasan Ditunda</TableHead>
-            <TableHead class="text-right">Aksi</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          <TableRow v-if="!data?.results.length">
-            <TableCell :colspan="8" class="py-8 text-center text-muted-foreground">Mail queue kosong.</TableCell>
-          </TableRow>
-          <TableRow v-for="item in data?.results" :key="item.id" v-else>
-            <TableCell class="font-mono">{{ item.id }}</TableCell>
-            <TableCell>
-              <Badge v-if="item.status === 'active'" variant="success">Active</Badge>
-              <Badge v-else variant="warning">Deferred</Badge>
-            </TableCell>
-            <TableCell class="text-muted-foreground">{{ item.size }}</TableCell>
-            <TableCell class="text-muted-foreground">{{ item.rawdate }}</TableCell>
-            <TableCell class="text-muted-foreground">{{ item.sender }}</TableCell>
-            <TableCell class="max-w-xs text-muted-foreground"><RecipientListPopover :recipient="item.recipient" /></TableCell>
-            <TableCell class="max-w-xs truncate text-muted-foreground" :title="item.reason">{{ item.reason || "-" }}</TableCell>
-            <TableCell><QueueItemActions :qid="item.id" /></TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
+      <TooltipProvider v-else-if="data">
+        <Table >
+          <TableHeader>
+            <TableRow>
+              <TableHead><RouterOSSortableHeader column-key="id" label="Queue ID" /></TableHead>
+              <TableHead><RouterOSSortableHeader column-key="status" label="Status" /></TableHead>
+              <TableHead><RouterOSSortableHeader column-key="size" label="Ukuran" /></TableHead>
+              <TableHead><RouterOSSortableHeader column-key="rawdate" label="Tanggal" /></TableHead>
+              <TableHead><RouterOSSortableHeader column-key="sender" label="Pengirim" /></TableHead>
+              <TableHead>Penerima</TableHead>
+              <TableHead>Alasan Ditunda</TableHead>
+              <TableHead class="text-right">Aksi</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow v-if="!data?.results.length">
+              <TableCell :colspan="8" class="py-8 text-center text-muted-foreground">Mail queue kosong.</TableCell>
+            </TableRow>
+            <TableRow v-for="item in data?.results" :key="item.id" v-else>
+              <TableCell class="font-mono">{{ item.id }}</TableCell>
+              <TableCell>
+                <Badge v-if="item.status === 'active'" variant="success" class="w-16">Active <MailHeaderView :qid="item.id" /></Badge>
+                <Badge v-else variant="warning" class="w-16">Deferred</Badge>
+              </TableCell>
+              <TableCell class="text-muted-foreground">{{ item.size }}</TableCell>
+              <TableCell class="text-muted-foreground">{{ item.rawdate }}</TableCell>
+              <TableCell class="text-muted-foreground">{{ item.sender }}</TableCell>
+              <!-- <TableCell class="max-w-xs text-muted-foreground"><RecipientListPopover :recipient="item.recipient" /></TableCell> -->
+              <TableCell class="max-w-xs text-muted-foreground"><ListTooltip :items="item.recipient?.split(' ')?? []" /></TableCell>
+              <TableCell class="text-muted-foreground">
+                <span v-if="!item.reason">-</span>
+                  <Tooltip v-else>
+                    <TooltipTrigger as-child class="text-destructive">
+                      <span class="cursor-help font-mono text-xs">
+                        {{ errorReason(item.reason) || "-" }}
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent class="w-80 whitespace-normal break-words">
+                      <p>{{ item.reason || "-" }}</p>
+                    </TooltipContent>
+                  </Tooltip>
+              </TableCell>
+              <TableCell><QueueItemActions :qid="item.id" /></TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </TooltipProvider>      
       <PaginationBar v-if="data" :count="data?.count ?? 0" :page-size="pageSize" :current-page="Number(route.query.page ?? '1')" />
     </Card>
   </div>

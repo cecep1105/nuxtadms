@@ -48,27 +48,29 @@ const recipients = computed(() => {
     .filter(Boolean)
 })
 
+
 const extraCount = computed(() => recipients.value.length - 1)
 </script>
 
 <template>
-  <span v-if="recipients.length <= 1" class="text-muted-foreground">{{ recipient || "-" }}</span>
+  <span v-if="extraCount === 0" class="text-muted-foreground">{{ recipients[0] || "-" }}</span>
+    <Tooltip v-else>
+      <TooltipTrigger as-child>
+        <span class="cursor-help">
+          {{ recipients[0] }} + {{ recipients.length - 1 }} lainnya
+        </span>
+      </TooltipTrigger>
 
-  <Popover v-else>
-    <PopoverTrigger as-child>
-      <button type="button" class="inline-flex items-center gap-1 text-left text-muted-foreground hover:text-foreground hover:underline">
-        <span class="truncate">{{ recipients[0] }}</span>
-        <span class="shrink-0 whitespace-nowrap text-xs">+ {{ extraCount }} lainnya</span>
-        <ChevronDown class="h-3 w-3 shrink-0" />
-      </button>
-    </PopoverTrigger>
-    <PopoverContent class="w-80" align="start">
-      <div class="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-        <Users class="h-3.5 w-3.5" /> {{ recipients.length }} Penerima
-      </div>
-      <div class="max-h-64 space-y-0.5 overflow-y-auto">
-        <p v-for="(r, i) in recipients" :key="i" class="truncate font-mono text-xs">{{ r }}</p>
-      </div>
-    </PopoverContent>
-  </Popover>
+      <TooltipContent class="w-[220px] bg-yellow-100">
+        <div class="space-y-1 text-foreground">
+          <p
+            v-for="recipient in recipients"
+            :key="recipient"
+            class="break-all text-xs dark:text-black"
+          >
+            {{ recipient }}
+          </p>
+        </div>
+      </TooltipContent>
+    </Tooltip>
 </template>

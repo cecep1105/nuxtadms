@@ -63,7 +63,7 @@ async function handleSubmit() {
 <template>
   <Dialog v-model:open="open">
     <Button v-if="mode === 'create'" size="sm" @click="open = true"><Plus class="h-3.5 w-3.5" /> Tambah User</Button>
-    <Button v-else variant="ghost" size="icon" aria-label="Edit" @click="open = true"><Pencil class="h-3.5 w-3.5" /></Button>
+    <Button v-else variant="ghost" size="icon" title="Edit" aria-label="Edit" @click="open = true"><Pencil class="h-3.5 w-3.5" /></Button>
 
     <DialogContent class="max-h-[85vh] max-w-lg overflow-y-auto">
       <DialogHeader>

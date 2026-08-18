@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { MoreVertical, Power, Loader2 } from "@lucide/vue"
+import { MoreVertical, Power, Loader2, MonitorPlay } from "@lucide/vue"
 import type { MikrotikDhcpLease } from "#shared/types/api"
 
 const props = defineProps<{ hostdata: MikrotikDhcpLease; basepath: string }>()
@@ -39,6 +39,12 @@ async function handleRemoveStatic() {
     removeStaticLoading.value = false
   }
 }
+
+const openVnc = (ip: string, port=5900) => {
+  window.location.href = `vnc://${ip}:${port}`
+}
+
+
 </script>
 
 <template>
@@ -55,6 +61,11 @@ async function handleRemoveStatic() {
           <DropdownMenuItem v-else class="text-destructive focus:text-destructive" @click="removeStaticConfirmOpen = true">
             <Power class="h-3.5 w-3.5" /> Delete Lease
           </DropdownMenuItem>
+          <DropdownMenuItem class="text-muted-foreground focus:text-foreground" @click="openVnc(hostdata.address)">
+            <MonitorPlay class="h-3.5 w-3.5" /> Remote VNC
+          </DropdownMenuItem>
+
+
         </DropdownMenuContent>
       </DropdownMenu>
     </PopoverTrigger>

@@ -59,7 +59,7 @@ function handleSubmit() {
 </script>
 
 <template>
-  <form class="grid grid-cols-1 gap-3 rounded-lg border border-border bg-card p-3 sm:grid-cols-2 lg:grid-cols-4" @submit.prevent="handleSubmit">
+  <form class="grid grid-cols-1 gap-3 rounded-lg border border-border bg-card p-3 sm:grid-cols-2 lg:grid-cols-3" @submit.prevent="handleSubmit">
     <div :class="cn('space-y-1.5', recapType === 'all' ? 'lg:col-span-2' : 'lg:col-span-3')">
       <Label>PIN / Nama</Label>
       <PinAutocomplete v-model="pin" />

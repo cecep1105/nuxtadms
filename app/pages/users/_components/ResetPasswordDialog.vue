@@ -56,7 +56,7 @@ async function handleDone() {
 
 <template>
   <Dialog v-model:open="open">
-    <Button variant="ghost" size="icon" aria-label="Reset password" @click="open = true">
+    <Button variant="ghost" size="icon" aria-label="Reset password" @click="open = true" title="Reset password">
       <KeyRound class="h-3.5 w-3.5" />
     </Button>
     <DialogContent class="max-w-sm">

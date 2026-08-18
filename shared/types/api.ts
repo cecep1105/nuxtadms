@@ -333,12 +333,23 @@ export interface MailAuthFailLogEntry {
   count?: number
 }
 
+export interface MailPostfixAlias {
+  uid: string
+  mail: string
+  maildrop: string[]
+}
+
 export interface MailQueueItem {
   id: string
   size: string
   rawdate: string
   sender: string
-  recipient: string
+  // BUKAN selalu string -- TERBUKTI bisa null/undefined di runtime utk
+  // pesan yg gagal ke-parse recipient-nya (mis. bounce) -- lihat
+  // catatan lengkap di RecipientListPopover.vue. Tipe dilebarkan
+  // supaya JUJUR mencerminkan bentuk SUNGGUHAN respons API, bukan
+  // idealisasi yg TIDAK dijamin backend/Flask API eksternal.
+  recipient: string | null
   reason: string
   status: "active" | "deferred"
 }

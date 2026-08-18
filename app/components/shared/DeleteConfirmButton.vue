@@ -33,7 +33,7 @@ async function handleDelete() {
 <template>
   <Dialog v-model:open="open">
     <Button
-      variant="ghost" size="icon" aria-label="Hapus"
+      variant="ghost" size="icon" aria-label="Hapus" title="Hapus"
       :disabled="disabled" :title="disabled ? disabledReason : undefined"
       class="text-destructive hover:text-destructive disabled:text-muted-foreground"
       @click="open = true"

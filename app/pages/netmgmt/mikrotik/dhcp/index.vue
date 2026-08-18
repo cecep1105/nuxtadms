@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Paginated, MikrotikDhcpLease } from "#shared/types/api"
+import { MonitorPlay } from "@lucide/vue"
 
 const PAGE_SIZE = 10
 const route = useRoute()

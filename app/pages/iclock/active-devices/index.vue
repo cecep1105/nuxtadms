@@ -90,11 +90,27 @@ function displayDevice(device: ActiveDevice): ActiveDevice {
   return overlay ? { ...device, ...overlay } : device
 }
 
-function isRecentlyActive(lastActivity: string | null): boolean {
+function isRecentlyActive2(lastActivity: string | null): boolean {
   if (!lastActivity) return false
   const t = new Date(lastActivity).getTime()
   return !Number.isNaN(t) && Date.now() - t < STALE_MS
 }
+
+function isRecentlyActive(lastActivity: string | null, lastData: string | null): boolean {
+  const timestamps = [lastActivity, lastData]
+    .filter((value): value is string => typeof value === "string" && value.trim().length > 0)
+    .map((value) => new Date(value).getTime())
+    .filter((time) => !Number.isNaN(time));
+
+  if (timestamps.length === 0) return false;
+
+  const latestTimestamp = Math.max(...timestamps);
+  return Date.now() - latestTimestamp < STALE_MS;
+}
+
+
+
+
 </script>
 
 <template>
@@ -148,7 +164,7 @@ function isRecentlyActive(lastActivity: string | null): boolean {
           </TableRow>
           <TableRow v-for="rawDevice in devicesData?.results" :key="rawDevice.SN" v-else>
             <TableCell>
-              <Badge v-if="isRecentlyActive(displayDevice(rawDevice).LastActivity)" variant="success"><Wifi class="mr-1 h-2.5 w-2.5" /> Online</Badge>
+              <Badge v-if="isRecentlyActive(displayDevice(rawDevice).LastActivity, displayDevice(rawDevice).LastData)" variant="success"><Wifi class="mr-1 h-2.5 w-2.5" /> Online</Badge>
               <Badge v-else variant="secondary"><WifiOff class="mr-1 h-2.5 w-2.5" /> Offline</Badge>
             </TableCell>
             <TableCell class="font-mono">{{ rawDevice.SN }}</TableCell>
